@@ -14,6 +14,101 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class Referee {
+
+    public Referee(InputStream is, PrintStream out, PrintStream err) throws IOException, WinException {
+        initReferee(2, new Properties());
+
+        Scanner in = new Scanner(is);
+
+        try {
+            // Read ###Start 2
+            in.nextLine();
+
+            out.println("###Input 0");
+            for (String line : getInitInputForPlayer(0)) {
+                out.println(line);
+            }
+
+            out.println("###Input 1");
+            for (String line : getInitInputForPlayer(1)) {
+                out.println(line);
+            }
+
+            int round = 0;
+
+            while (round < getMaxRoundCount(2)) {
+                out.println("###Input 0");
+                for (String line : getInputForPlayer(round, 0)) {
+                    out.println(line);
+                }
+
+                out.println("###Output 0 1");
+                try {
+                    handlePlayerOutput(0, round, 0, getOutputForPlayer(0, in));
+                } catch (LostException e) {
+                    err.println("###Error 0 Lost " + e.getMessage());
+                    players.get(0).setDead();
+                } catch (InvalidInputException e) {
+                    err.println("###Error 0 InvalidInput " + e.getMessage());
+                    players.get(0).setDead();
+                }
+
+                out.println("###Input 1");
+                for (String line : getInputForPlayer(round, 1)) {
+                    out.println(line);
+                }
+
+                out.println("###Output 1 1");
+                try {
+                    handlePlayerOutput(0, round, 1, getOutputForPlayer(1, in));
+                } catch (LostException e) {
+                    err.println("###Error 1 Lost " + e.getMessage());
+                    players.get(1).setDead();
+                } catch (InvalidInputException e) {
+                    err.println("###Error 1 InvalidInput " + e.getMessage());
+                    players.get(1).setDead();
+                }
+
+                try {
+                    updateGame(round);
+                } catch (GameOverException e) {
+                    if (players.get(0).getScore() > players.get(1).getScore()) {
+                        out.println("###End 0 1");
+                    } else if (players.get(0).getScore() < players.get(1).getScore()) {
+                        out.println("###End 1 0");
+                    } else {
+                        out.println("###End 01");
+                    }
+
+                    return;
+                }
+
+                round += 1;
+            }
+
+            if (players.get(0).getScore() > players.get(1).getScore()) {
+                out.println("###End 0 1");
+            } else if (players.get(0).getScore() < players.get(1).getScore()) {
+                out.println("###End 1 0");
+            } else {
+                out.println("###End 01");
+            }
+        } finally {
+            in.close();
+        }
+    }
+
+    private String[] getOutputForPlayer(int playerIdx, Scanner in) {
+        int shipCount = players.get(playerIdx).shipsAlive.size();
+        String[] result = new String[shipCount]; int i = 0;
+        while (i < shipCount) result[i++] = in.nextLine();
+        return result;
+    }
+
+    public static void main(String... args) throws IOException, WinException {
+        new Referee(System.in, System.out, System.err);
+    }
+
     private static final int LEAGUE_LEVEL = 3;
 
     private static final int MAP_WIDTH = 23;
@@ -641,103 +736,7 @@ class Referee {
     private int barrelCount;
     private Random random;
     
-    private InputStream is;
-    private PrintStream out;
-    private PrintStream err;
 
-    public Referee(InputStream is, PrintStream out, PrintStream err) throws IOException, WinException {
-        initReferee(2, new Properties());
-
-        Scanner in = new Scanner(is);
-
-        try {
-            // Read ###Start 2
-            in.nextLine();
-
-            out.println("###Input 0");
-            for (String line : getInitInputForPlayer(0)) {
-                out.println(line);
-            }
-
-            out.println("###Input 1");
-            for (String line : getInitInputForPlayer(1)) {
-                out.println(line);
-            }
-
-            int round = 0;
-
-            while (round < getMaxRoundCount(2)) {
-                out.println("###Input 0");
-                for (String line : getInputForPlayer(round, 0)) {
-                    out.println(line);
-                }
-
-                out.println("###Output 0 1");
-                try {
-                    handlePlayerOutput(0, round, 0, getOutputForPlayer(0, in));
-                } catch (LostException e) {
-                    err.println("###Error 0 Lost " + e.getMessage());
-                    players.get(0).setDead();
-                } catch (InvalidInputException e) {
-                    err.println("###Error 0 InvalidInput " + e.getMessage());
-                    players.get(0).setDead();
-                }
-
-                out.println("###Input 1");
-                for (String line : getInputForPlayer(round, 1)) {
-                    out.println(line);
-                }
-
-                out.println("###Output 1 1");
-                try {
-                    handlePlayerOutput(0, round, 1, getOutputForPlayer(1, in));
-                } catch (LostException e) {
-                    err.println("###Error 1 Lost " + e.getMessage());
-                    players.get(1).setDead();
-                } catch (InvalidInputException e) {
-                    err.println("###Error 1 InvalidInput " + e.getMessage());
-                    players.get(1).setDead();
-                }
-                
-                try {
-                    updateGame(round);
-                } catch (GameOverException e) {
-                    if (players.get(0).getScore() > players.get(1).getScore()) {
-                        out.println("###End 0 1");
-                    } else if (players.get(0).getScore() < players.get(1).getScore()) {
-                        out.println("###End 1 0");
-                    } else {
-                        out.println("###End 01");
-                    }
-
-                    return;
-                }
-
-                round += 1;
-            }
-
-            if (players.get(0).getScore() > players.get(1).getScore()) {
-                out.println("###End 0 1");
-            } else if (players.get(0).getScore() < players.get(1).getScore()) {
-                out.println("###End 1 0");
-            } else {
-                out.println("###End 01");
-            }
-        } finally {
-            in.close();
-        }
-    }
-
-    private String[] getOutputForPlayer(int playerIdx, Scanner in) {
-        int shipCount = players.get(playerIdx).shipsAlive.size();
-        String[] result = new String[shipCount]; int i = 0;
-        while (i < shipCount) result[i++] = in.nextLine();
-        return result;
-    }
-
-    public static void main(String... args) throws IOException, WinException {
-        new Referee(System.in, System.out, System.err);
-    }
 
     protected void initReferee(int playerCount, Properties prop) throws InvalidFormatException {
         seed = Long.valueOf(prop.getProperty("seed", String.valueOf(new Random(System.currentTimeMillis()).nextLong())));
