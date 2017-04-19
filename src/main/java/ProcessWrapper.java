@@ -21,20 +21,37 @@ public class ProcessWrapper {
         stdIn = process.getOutputStream();
     }
 
-    public void toStdIn(String s) throws IOException {
-        if (!s.endsWith("\n")) s += "\n";
-        stdIn.write(s.getBytes());
-        stdIn.flush();
-        if (debug) System.out.println(name + " gets: " + s);
+    public void toStdIn(String s) {
+        try {
+            if (!s.endsWith("\n")) s += "\n";
+            stdIn.write(s.getBytes());
+            stdIn.flush();
+            if (debug) System.out.println(name + " gets: " + s);
+        } catch (Exception e) {throw  new RuntimeException(e);}
     }
 
-    public List<String> fromStdOut() throws IOException {
-        List<String> result = new ArrayList<>(); String tmp;
-        while ((tmp = stdOut.readLine()) != null) {
-            if (debug) System.out.println(name + " writes: " + tmp);
-            result.add(tmp);
-        }
-        return result;
+    public List<String> fromStdOut(int lines) {
+        try {
+            List<String> result = new ArrayList<>(); String tmp;
+            System.out.println("asdfasdfsdfdfasd");
+            while ((stdOut.ready() || lines > 0) && (tmp = stdOut.readLine()) != null) {
+                lines--;
+                if (debug) System.out.println(name + " writes: " + tmp);
+                result.add(tmp);
+            }
+            return result;
+        } catch (Exception e) {throw  new RuntimeException(e);}
+    }
+
+    public List<String> fromStdOut() {
+        try {
+            List<String> result = new ArrayList<>(); String tmp;
+            while (stdOut.ready() && (tmp = stdOut.readLine()) != null) {
+                if (debug) System.out.println(name + " writes: " + tmp);
+                result.add(tmp);
+            }
+            return result;
+        } catch (Exception e) {throw  new RuntimeException(e);}
     }
 
 
