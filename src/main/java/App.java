@@ -7,26 +7,37 @@ import java.util.stream.Collectors;
 
 public class App {
     public static void main(String[] args) throws IOException, InterruptedException {
-        ProcessWrapper refereeProcessW = new ProcessWrapper(getProcess(new String[]{"java", "Referee"}), "referee", true);
-        ProcessWrapper bot1ProcessW = new ProcessWrapper(getProcess(new String[]{"java", "bot.Player"}), "bot1", true);
-
+        ProcessWrapper refereeProcessW = new ProcessWrapper(getProcess("Referee"), "referee", true);
+        ProcessWrapper bot1ProcessW = new ProcessWrapper(getProcess("bot.Player"), "bot1", true);
+        ProcessWrapper bot2ProcessW = new ProcessWrapper(getProcess("bot.Player"), "bot1", true);
+        ProcessWrapper[] bots = new ProcessWrapper[]{bot1ProcessW, bot2ProcessW};
 
         refereeProcessW.toStdIn("Hiii");
-        final List<String> refereeInitOut = refereeProcessW.fromStdOut();
-        refereeInitOut.removeIf((s) -> s.contains("###"));
-//        int entityCount = Integer.valueOf(refereeInitOut.get(1));
-        refereeInitOut.forEach(bot1ProcessW::toStdIn);
+        refereeProcessW.fromStdOut(2); //skip ###Input
+        while (true) {
+            for (ProcessWrapper bot : bots) {
+                refereeProcessW.fromStdOut(1); //skip ###Input
 
-        refereeProcessW.toStdIn(bot1ProcessW.fromStdOut(1).get(0));
+                List<String> first2Lines = refereeProcessW.fromStdOut(2);
+                int shipNum = Integer.valueOf(first2Lines.get(0));
+                int entitiesNum = Integer.valueOf(first2Lines.get(1));
+                first2Lines.forEach(bot::toStdIn);
 
-        refereeProcessW.fromStdOut().forEach(System.out::println);
+                refereeProcessW.fromStdOut(entitiesNum).forEach(bot::toStdIn);
 
+                refereeProcessW.fromStdOut(1);
+
+                bot.fromStdOut(shipNum).forEach(refereeProcessW::toStdIn);
+
+            }
+        }
     }
 
-    private static Process getProcess(String[] ss) throws IOException {
-        ProcessBuilder processBuilder = new ProcessBuilder(ss);
+    private static Process getProcess(String className) throws IOException {
+        ProcessBuilder processBuilder = new ProcessBuilder(
+            new String[]{"java", "-cp", ".", className});
         inheritEnv(processBuilder.environment());
-        setDirectory(processBuilder, ss[1]);
+        setDirectory(processBuilder, className);
 //        processBuilder.redirectErrorStream(true);
 //        processBuilder.inheritIO();
         return processBuilder.start();
