@@ -5,18 +5,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class App {
+public class GameManager {
+
+    private static String winner;
+
     public static void main(String[] args) throws IOException, InterruptedException {
         ProcessWrapper refereeProcessW = new ProcessWrapper(getProcess("Referee"), "referee", true);
-        ProcessWrapper bot1ProcessW = new ProcessWrapper(getProcess("bot.Player"), "bot1", true);
-        ProcessWrapper bot2ProcessW = new ProcessWrapper(getProcess("bot.Player"), "bot1", true);
-        ProcessWrapper[] bots = new ProcessWrapper[]{bot1ProcessW, bot2ProcessW};
+        ProcessWrapper bot0ProcessW = new ProcessWrapper(getProcess("bot.TemplateBot"), "tBot", true);
+        ProcessWrapper bot1ProcessW = new ProcessWrapper(getProcess("bot.GPBot"), "gpBot", true);
+        ProcessWrapper[] bots = new ProcessWrapper[]{bot0ProcessW, bot1ProcessW};
 
         refereeProcessW.toStdIn("Hiii");
         refereeProcessW.fromStdOut(2); //skip ###Input
-        while (true) {
+        outer: while (true) {
             for (ProcessWrapper bot : bots) {
-                refereeProcessW.fromStdOut(1); //skip ###Input
+                String cmdFromReferee = refereeProcessW.fromStdOut(1).get(0);
+                if (validateCmd(cmdFromReferee)) {break outer;}
 
                 List<String> first2Lines = refereeProcessW.fromStdOut(2);
                 int shipNum = Integer.valueOf(first2Lines.get(0));
@@ -31,6 +35,28 @@ public class App {
 
             }
         }
+        System.out.println(winner);
+    }
+
+    private static boolean validateCmd(String cmdFromReferee) {
+        if (cmdFromReferee.contains("End")) {
+            String[] split = cmdFromReferee.split(" ");
+            for (String s : split) {
+                System.out.println("split " + s);
+            }
+            if (split.length == 2) { winner = "-"; }
+            // beware - inverse logic
+            // ###End 0 1 means that bot0 won
+            else if (split[1].equals("1")) { winner = "1"; }
+            else { winner = "0"; }
+            return true;
+        }
+        if (cmdFromReferee.contains("Error")) {
+            int playerLostId = Integer.valueOf(cmdFromReferee.split(" ")[1]);
+            winner = playerLostId == 0 ? "1" : "0";
+            return true;
+        }
+        return false;
     }
 
     private static Process getProcess(String className) throws IOException {
