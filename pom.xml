@@ -24,4 +24,13 @@
         </plugins>
     </build>
 
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/edu.gmu.cs/ecj -->
+        <dependency>
+            <groupId>edu.gmu.cs</groupId>
+            <artifactId>ecj</artifactId>
+            <version>22</version>
+        </dependency>
+    </dependencies>
+
 </project>

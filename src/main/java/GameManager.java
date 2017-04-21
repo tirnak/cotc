@@ -8,15 +8,21 @@ import java.util.stream.Collectors;
 public class GameManager {
 
     private static String winner;
+//    private static List<String> validBotNames;
+//    static {
+//
+//    }
 
     public static void main(String[] args) throws IOException, InterruptedException {
+        if (args.length != 2) { throw new RuntimeException("there must be 2 bot classes mentioned as args"); }
         ProcessWrapper refereeProcessW = new ProcessWrapper(getProcess("Referee"), "referee", true);
-        ProcessWrapper bot0ProcessW = new ProcessWrapper(getProcess("bot.TemplateBot"), "tBot", true);
-        ProcessWrapper bot1ProcessW = new ProcessWrapper(getProcess("bot.GPBot"), "gpBot", true);
+        ProcessWrapper bot0ProcessW = new ProcessWrapper(getProcess("bot."+args[0]), args[0]+"0", true);
+        ProcessWrapper bot1ProcessW = new ProcessWrapper(getProcess("bot."+args[1]), args[1]+"1", true);
         ProcessWrapper[] bots = new ProcessWrapper[]{bot0ProcessW, bot1ProcessW};
 
         refereeProcessW.toStdIn("Hiii");
         refereeProcessW.fromStdOut(2); //skip ###Input
+        int rounds = 0;
         outer: while (true) {
             for (ProcessWrapper bot : bots) {
                 String cmdFromReferee = refereeProcessW.fromStdOut(1).get(0);
@@ -34,8 +40,9 @@ public class GameManager {
                 bot.fromStdOut(shipNum).forEach(refereeProcessW::toStdIn);
 
             }
+            rounds++;
         }
-        System.out.println(winner);
+        System.out.println(winner + " " + rounds);
     }
 
     private static boolean validateCmd(String cmdFromReferee) {
