@@ -1,5 +1,4 @@
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +13,11 @@ public class GameManager {
 //    }
 
     public static void main(String[] args) throws IOException, InterruptedException {
+//        for (String arg : args) { log(arg);}
         if (args.length != 2) { throw new RuntimeException("there must be 2 bot classes mentioned as args"); }
-        ProcessWrapper refereeProcessW = new ProcessWrapper(getProcess("Referee"), "referee", true);
-        ProcessWrapper bot0ProcessW = new ProcessWrapper(getProcess("bot."+args[0]), args[0]+"0", true);
-        ProcessWrapper bot1ProcessW = new ProcessWrapper(getProcess("bot."+args[1]), args[1]+"1", true);
+        ProcessWrapper refereeProcessW = new ProcessWrapper(getProcess("Referee"), "referee", false);
+        ProcessWrapper bot0ProcessW = new ProcessWrapper(getProcess("bot."+args[0]), args[0]+"0", false);
+        ProcessWrapper bot1ProcessW = new ProcessWrapper(getProcess("bot."+args[1]), args[1]+"1", false);
         ProcessWrapper[] bots = new ProcessWrapper[]{bot0ProcessW, bot1ProcessW};
 
         refereeProcessW.toStdIn("Hiii");
@@ -49,7 +49,7 @@ public class GameManager {
         if (cmdFromReferee.contains("End")) {
             String[] split = cmdFromReferee.split(" ");
             for (String s : split) {
-                System.out.println("split " + s);
+//                System.out.println("split " + s);
             }
             if (split.length == 2) { winner = "-"; }
             // beware - inverse logic
@@ -100,9 +100,33 @@ public class GameManager {
     }
 
     private static List<String> ls(String path) {
-        System.out.println("path: " + path);
-        System.out.println("files: " + Arrays.toString(new File(path).listFiles()));
+//        log("path: " + path);
+//        log("files: " + Arrays.toString(new File(path).listFiles()));
 
         return Arrays.asList(new File( path ).listFiles()).stream().map(File::getName).collect(Collectors.toList());
+    }
+
+    public static PrintWriter logger;
+
+    static {
+        try(FileWriter fw = new FileWriter("logs/referee.log", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw))
+        {
+            logger = out;
+        } catch (IOException e) {
+
+        }
+    }
+
+    public static void log(String s) {
+        try(FileWriter fw = new FileWriter("logs/referee.log", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw))
+        {
+            out.println(s);
+        } catch (IOException e) {
+
+        }
     }
 }

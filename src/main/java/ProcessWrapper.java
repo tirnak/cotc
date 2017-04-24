@@ -25,32 +25,25 @@ public class ProcessWrapper {
             if (!s.endsWith("\n")) s += "\n";
             stdIn.write(s.getBytes());
             stdIn.flush();
-            if (debug) System.out.print(name + " gets: " + s);
+            logIfDebug(name + " gets: " + s);
         } catch (Exception e) {throw  new RuntimeException(e);}
     }
 
     public List<String> fromStdOut(int lines) {
         try {
             List<String> result = new ArrayList<>(); String tmp;
-            System.out.println("fromStdOut "+name);
+            logIfDebug("fromStdOut " + name);
             while (lines-- > 0 && (tmp = stdOut.readLine()) != null) {
-                if (debug) System.out.println(name + " writes: " + tmp);
+                logIfDebug(name + " writes: " + tmp);
                 result.add(tmp);
             }
             return result;
         } catch (Exception e) {throw  new RuntimeException(e);}
     }
 
-//    public List<String> fromStdOut() {
-//        try {
-//            List<String> result = new ArrayList<>(); String tmp;
-//            while (stdOut.ready() && (tmp = stdOut.readLine()) != null) {
-//                if (debug) System.out.println(name + " writes: " + tmp);
-//                result.add(tmp);
-//            }
-//            return result;
-//        } catch (Exception e) {throw  new RuntimeException(e);}
-//    }
-
+    private void logIfDebug(String s) {
+        if (!debug) return;
+        System.out.println(s);
+    }
 
 }

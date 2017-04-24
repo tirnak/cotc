@@ -1,0 +1,96 @@
+parent.0 = koza.params
+
+# You need to create at least one function set,
+# called "f0", which your first tree will use.
+
+gp.fs.size = 1
+gp.fs.0.name = f0
+
+### The functions, carefully ordered :-)  (See below)
+
+gp.fs.0.func.0 = gp.func.terminal.Bs
+gp.fs.0.func.0.nc = nc0
+gp.fs.0.func.1 = gp.func.terminal.Cs
+gp.fs.0.func.1.nc = nc0
+gp.fs.0.func.2 = gp.func.terminal.Enemy
+gp.fs.0.func.2.nc = nc0
+gp.fs.0.func.3 = gp.func.terminal.Ms
+gp.fs.0.func.3.nc = nc0
+gp.fs.0.func.4 = gp.func.terminal.My
+gp.fs.0.func.4.nc = nc0
+gp.fs.0.func.5 = gp.func.terminal.MyI
+gp.fs.0.func.5.nc = nc0
+gp.fs.0.func.6 = gp.func.terminal.Null
+gp.fs.0.func.6.nc = nc0
+gp.fs.0.func.7 = gp.func.terminal.RandomDouble
+gp.fs.0.func.7.nc = nc0
+
+gp.fs.0.func.8 = gp.func.bool.And
+gp.fs.0.func.8.nc = nc2
+gp.fs.0.func.9 = gp.func.bool.Not
+gp.fs.0.func.9.nc = nc1
+gp.fs.0.func.10 = gp.func.bool.Or
+gp.fs.0.func.10.nc = nc2
+gp.fs.0.func.11 = gp.func.bool.Xor
+gp.fs.0.func.11.nc = nc2
+
+gp.fs.0.func.12 = gp.func.math.Divide
+gp.fs.0.func.12.nc = nc2
+gp.fs.0.func.13 = gp.func.math.GetDistance
+gp.fs.0.func.13.nc = nc2
+gp.fs.0.func.14 = gp.func.math.GetX
+gp.fs.0.func.14.nc = nc1
+gp.fs.0.func.15 = gp.func.math.GetY
+gp.fs.0.func.15.nc = nc1
+gp.fs.0.func.16 = gp.func.math.Multiply
+gp.fs.0.func.16.nc = nc2
+gp.fs.0.func.17 = gp.func.math.Subtract
+gp.fs.0.func.17.nc = nc2
+gp.fs.0.func.18 = gp.func.math.Sum
+gp.fs.0.func.18.nc = nc2
+
+gp.fs.0.func.19 = gp.func.print.PrintWait
+gp.fs.0.func.19.nc = nc0
+gp.fs.0.func.20 = gp.func.print.PrintFire
+gp.fs.0.func.20.nc = nc2
+gp.fs.0.func.21 = gp.func.print.PrintMove
+gp.fs.0.func.21.nc = nc2
+
+gp.fs.0.func.22 = gp.func.bool.Equals
+gp.fs.0.func.22.nc = nc2
+gp.fs.0.func.23 = gp.func.GetClosest
+gp.fs.0.func.23.nc = nc2
+gp.fs.0.func.24 = gp.func.bool.Ifelse
+gp.fs.0.func.24.nc = nc3
+gp.fs.0.func.25 = gp.func.bool.Less
+gp.fs.0.func.25.nc = nc2
+gp.fs.0.func.26 = gp.func.bool.More
+gp.fs.0.func.26.nc = nc2
+
+
+eval.problem = gp.BotGame
+# Because our GPData is completely empty, we can just use
+# GPData directly
+eval.problem.data = ec.gp.GPData
+gp.fs.0.size = 27
+
+
+
+pop.subpops =				1
+
+
+
+pop.subpop.0 = 				ec.Subpopulation
+pop.subpop.0.size =			2048
+pop.subpop.0.duplicate-retries =	5
+pop.subpop.0.species = ec.gp.GPSpecies
+pop.subpop.0.species.pipe = ec.breed.MultiBreedingPipeline
+pop.subpop.0.species.pipe.num-sources = 2
+
+
+# Default HalfBuilder (ramped half/half tree building) parameters
+gp.koza.half.growp = 0.5
+gp.koza.half.max-depth = 40
+gp.koza.xover.maxdepth = 30
+
+generations = 15

@@ -1,14 +1,12 @@
 package bot;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
-    /**
-     * Auto-generated code below aims at helping you parse
-     * the standard input according to the problem statement.
-     **/
+/**
+ * Auto-generated code below aims at helping you parse
+ * the standard input according to the problem statement.
+ **/
 class TemplateBot {
 
     public static void main(String args[]) throws IllegalAccessException, InstantiationException {
@@ -61,16 +59,36 @@ class TemplateBot {
         if (closest == null && closestEnemy == null) {
             System.out.format("WAIT%n");
         } else if (myI.getDist(closestEnemy) < 3 || closest == null) {
-            System.out.format("FIRE %d %d%n", closestEnemy.x, closestEnemy.y);
+            System.out.format("FIRE %d %d%n", r(closestEnemy.x), r(closestEnemy.y));
         } else {
-            System.out.format("MOVE %d %d%n", closest.x, closest.y); // Any valid action, such as "WAIT" or "MOVE x y"
+            System.out.format("MOVE %d %d%n", r(closest.x), r(closest.y)); // Any valid action, such as "WAIT" or "MOVE x y"
             bs.remove(closest);
         }
+    }
+
+    static long r(double d) { return Math.round(d); }
+
+    static long x(double d) { return Math.abs(Math.round(d)) % 21; }
+    static long y(double d) { return Math.abs(Math.round(d)) % 23; }
+
+    static boolean equals(Object object1, Object object2) {
+        if (object1 == null && object2 == null) return true;
+        if (object1 == null || object2 == null) return false;
+        return object1.equals(object2);
+    }
+
+    static boolean equals(double f1, double f2) {
+        return f1 - f2 > -0.001 && f1 - f2 < 0.001;
+    }
+
+    static double getDist(Entity e1, Entity e2) {
+        if (e1 == null || e2 == null) return Double.MAX_VALUE;
+        return e1.getDist(e2);
     }
 }
 
 class Entity {
-    int id, x, y;
+    double id, x, y;
     public Entity(int id, int x, int y) {this.id = id; this.x=x; this.y=y;}
     public double getDist(Entity other) {
         return Math.sqrt(Math.pow(other.x-x,2) + Math.pow(other.y-y,2));

@@ -1,0 +1,18 @@
+<prog>      ::= <ifelse>
+#
+<ifelse>    ::= (ifelse <bool> <statement> <statement>)
+<statement> ::= <ifelse> | <print>
+#
+<bool>      ::= (and <bool> <bool>) | (or <bool> <bool>) | (xor <bool> <bool>) | (not <bool>)
+<bool>      ::= (less <double> <double>) | (more <double> <double>) | (equals <double> <double>)
+<bool>      ::= (equals <entity> <entity>) | (equals <entity> <null>)
+#
+<double>     ::= (mult <double> <double>) | (div <double> <double>) | (plus <double> <double>) | (minus <double> <double>)
+<double>     ::= (getDist <entity> <entity>) | (getX <entity>) | (getY <entity>) | (randomDouble)
+#
+<el>        ::= (bs) | (my) | (enemy) | (ms) | (cs)
+<entity>    ::= (myI)|(getClosest <entity> <el>)
+#
+<null>      ::= (null)
+#
+<print>     ::= (wait)|(fire <double> <double>)|(move <double> <double>)
